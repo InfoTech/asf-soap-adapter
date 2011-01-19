@@ -17,7 +17,6 @@ begin
     gem.add_dependency('rforce-raygao', '>=1.0')
     gem.add_dependency('builder', '>= 1.2.4')
     gem.add_dependency('hpricot', '>=0.8.2')
-    gem.add_dependency('facets', '=2.8.4')
     gem.add_dependency('oauth', '=0.4.4')
 
     #gem.add_dependency('rails', '>= 2.3.3')
