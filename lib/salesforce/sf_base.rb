@@ -58,7 +58,9 @@ module Salesforce
       #result this.connection.binding.logout(Hash.new)
     end
 
-    establish_connection "salesforce-default-realm"
+    Rails::Application.initializer "set_salesforce_connection", :after => "active_record.set_configs" do
+      Salesforce::SfBase.establish_connection "salesforce-default-realm"
+    end    
   
     set_table_name 'salesforce_sf_bases'
 

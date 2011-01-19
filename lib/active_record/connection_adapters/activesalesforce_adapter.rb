@@ -174,7 +174,7 @@ module ActiveRecord
 
       # For Silent-e, added 'tables' method to solve ARel problem
       def tables(name = nil) #:nodoc:
-        @connection.describeGlobal({}).describeGlobalResponse.result.types
+        @connection.describeGlobal({}).describeGlobalResponse.result.types || []
       end
 
       def table_exists?(table_name)
@@ -315,7 +315,6 @@ module ActiveRecord
       # So, if you are having problems, make sure you check 'soql' and toggle the
       # 'result' object.
       def select_all(sql, name = nil) #:nodoc:
-
         # silent-e's solution for single quote escape
         # fix the single quote escape method in WHERE condition expression
         sql = fix_single_quote_in_where(sql)
@@ -325,6 +324,8 @@ module ActiveRecord
 
 
         raw_table_name = sql.match(/FROM (\w+)/mi)[1]
+
+        sql.gsub!("#{raw_table_name}.*", "*")
 
         table_name, columns, entity_def = lookup(raw_table_name)
 
@@ -380,7 +381,7 @@ module ActiveRecord
 
         @connection.batch_size = @batch_size if @batch_size
         @batch_size = nil
-
+        
         query_result = get_result(@connection.query(:queryString => soql), :query)
         result = ActiveSalesforce::ResultArray.new(query_result[:size].to_i)
         return result unless query_result[:records]
