@@ -227,7 +227,7 @@ module ActiveRecord
 
       # Begins the transaction (and turns off auto-committing).
       def begin_db_transaction
-        log('Opening boxcar', 'begin_db_transaction()')
+        log('Opening boxcar', 'begin_db_transaction()') { }
         @command_boxcar = []
       end
 
@@ -270,7 +270,7 @@ module ActiveRecord
 
       # Commits the transaction (and turns on auto-committing).
       def commit_db_transaction()
-        log("Committing boxcar with #{@command_boxcar.length} commands", 'commit_db_transaction()')
+        log("Committing boxcar with #{@command_boxcar.length} commands", 'commit_db_transaction()') { }
 
         previous_command = nil
         commands = []
@@ -301,7 +301,7 @@ module ActiveRecord
       # Rolls back the transaction (and turns on auto-committing). Must be
       # done if the transaction block raises an exception or returns false.
       def rollback_db_transaction()
-        log('Rolling back boxcar', 'rollback_db_transaction()')
+        log('Rolling back boxcar', 'rollback_db_transaction()') { }
         @command_boxcar = nil
       end
 
@@ -320,12 +320,13 @@ module ActiveRecord
         sql = fix_single_quote_in_where(sql)
         # Arel adds the class to the selection - we do not want this i.e...
         # SELECT     contacts.* FROM  => SELECT * FROM
-        sql = sql.gsub(/SELECT\s+[^\(][A-Z]+\./mi," ")
 
 
         raw_table_name = sql.match(/FROM (\w+)/mi)[1]
 
         sql.gsub!("#{raw_table_name}.*", "*")
+
+        sql = sql.gsub(/SELECT\s+[^\(][A-Z]+\./mi," ")
 
         table_name, columns, entity_def = lookup(raw_table_name)
 
@@ -876,6 +877,10 @@ module ActiveRecord
         @logger.debug(msg) if @logger
       end
 
+      def primary_key(table)
+        "id"
+      end
+      
       protected
 
       # For Silent-e, added 'tables' method to solve ARel problem
@@ -909,7 +914,6 @@ module ActiveRecord
           send_commands([command])
         end
       end
-
     end
 
   end
